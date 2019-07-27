@@ -162,3 +162,24 @@ function get_string_between($string, $start, $end){
     $len = strpos($string, $end, $ini) - $ini;
     return substr($string, $ini, $len);
 }
+
+/**
+* Adding columns for events post type in admin area
+**/
+add_filter( 'manage_simple_jobs1_posts_columns', 'simple_jobs1_filter_posts_columns' );
+function simple_jobs1_filter_posts_columns( $columns ) {   
+    $columns['shortcode'] = __( 'Shortcode' );
+    return $columns;
+}
+
+/**
+* Populating columns for events post type in admin area
+**/
+add_action( 'manage_simple_jobs1_posts_custom_column', 'simple_jobs1_realestate_column', 10, 2);
+function simple_jobs1_realestate_column( $column, $post_id ) {
+    // Image column
+    if ( 'shortcode' === $column ) {
+        echo get_the_post_thumbnail( $post_id, array(80, 80) );
+        echo "<b>[show_text id='".$post_id."']</b>";
+    }    
+}
