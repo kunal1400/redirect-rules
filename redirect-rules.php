@@ -26,7 +26,7 @@
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
 
 /**
@@ -71,15 +71,15 @@ function widget_redirect_rules_cb() {
         'supports'           => array( 'title', 'editor' )
     );
 
-    register_post_type( 'simple_jobs1', $args );
+    register_post_type( 'wrrules', $args );
 }
 
 
 /**
 * Registering the meta boxes for other job information
 **/
-add_action( 'add_meta_boxes_simple_jobs1', 'adding_simple_jobs1_boxes', 10, 2 );
-function adding_simple_jobs1_boxes() {
+add_action( 'add_meta_boxes_wrrules', 'adding_wrrules_boxes', 10, 2 );
+function adding_wrrules_boxes() {
     $screen = get_current_screen();
     add_meta_box(
         'other-job-informations-meta-box',
@@ -134,7 +134,7 @@ function show_text_shortcode_callback( $atts, $shortCodecontent ) {
     $post        = get_post($a['id']);
     $redirectUrl = get_post_meta($a['id'], '_redirect_url', ARRAY_A);
     
-    if( !empty($_GET['wrid']) ) {
+    if( !empty($_GET['wrid']) && $a['id'] == $_GET['wrid'] ) {
         $referenceShortCodeData = get_post($_GET['wrid']);        
         return $referenceShortCodeData->post_content;
     }
@@ -144,7 +144,7 @@ function show_text_shortcode_callback( $atts, $shortCodecontent ) {
         if( $a['id'] ) {
             $parsed  = get_string_between($oldShortCodecontent, '[tag]', '[/tag]');
             $search  = '[tag]'.$parsed.'[/tag]';
-            $replace = '<a href="'.$redirectUrl.'?wrid='.$a['id'].'" target="_blank">'.$parsed.'</a>';
+            $replace = '<a href="'.$redirectUrl.'?wrid='.$a['id'].'">'.$parsed.'</a>';
             return str_replace($search, $replace, $shortCodecontent);
         }
         else {
@@ -166,20 +166,25 @@ function get_string_between($string, $start, $end){
 /**
 * Adding columns for events post type in admin area
 **/
-add_filter( 'manage_simple_jobs1_posts_columns', 'simple_jobs1_filter_posts_columns' );
-function simple_jobs1_filter_posts_columns( $columns ) {   
+add_filter( 'manage_wrrules_posts_columns', 'wrrules_filter_posts_columns' );
+function wrrules_filter_posts_columns( $columns ) {   
     $columns['shortcode'] = __( 'Shortcode' );
+    $columns['example'] = __( 'Example' );
     return $columns;
 }
 
 /**
 * Populating columns for events post type in admin area
 **/
-add_action( 'manage_simple_jobs1_posts_custom_column', 'simple_jobs1_realestate_column', 10, 2);
-function simple_jobs1_realestate_column( $column, $post_id ) {
+add_action( 'manage_wrrules_posts_custom_column', 'wrrules_realestate_column', 10, 2);
+function wrrules_realestate_column( $column, $post_id ) {
     // Image column
     if ( 'shortcode' === $column ) {
         echo get_the_post_thumbnail( $post_id, array(80, 80) );
         echo "<b>[show_text id='".$post_id."']</b>";
-    }    
+    }
+    if ( 'example' === $column ) {
+        echo get_the_post_thumbnail( $post_id, array(80, 80) );
+        echo "<b>[show_text id='".$post_id."']Go to[tag]Join Us[/tag][/show_text]</b>";
+    }
 }
